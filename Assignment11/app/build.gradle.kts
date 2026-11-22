@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.android.application")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
 }
@@ -45,10 +44,6 @@ android {
         // 2. Add this line, where YOUR_API_KEY is your API key:
         //        MAPS_API_KEY=YOUR_API_KEY
         propertiesFileName = "secrets.properties"
-
-        // A properties file containing default secret values. This file can be
-        // checked in version control.
-        defaultPropertiesFileName = "local.defaults.properties"
     }
 }
 

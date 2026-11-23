@@ -489,50 +489,31 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
 
+        Trip trip = new Trip();
+        trip.setUserId(user.getUid());
+        trip.setTripName((startAddress != null ? startAddress : "Start") + " to " + (endAddress != null ? endAddress : "End"));
+        trip.setStartAddress(startAddress);
+        trip.setEndAddress(endAddress);
+        trip.setStartLat(startLatLng.latitude);
+        trip.setStartLng(startLatLng.longitude);
+        trip.setEndLat(endLatLng.latitude);
+        trip.setEndLng(endLatLng.longitude);
+        trip.setEncodedPolyline(encodedPolyline);
+        trip.setGasStations(currentGasStations);
+        trip.setTimestamp(System.currentTimeMillis());
+
         FirebaseFirestore.getInstance().collection("trips")
-                .whereEqualTo("encodedPolyline", encodedPolyline)
-                .limit(1)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()) {
-                            boolean uniqueTrip = task.getResult().isEmpty();
-
-                            if(uniqueTrip) {
-                                Trip trip = new Trip();
-                                trip.setUserId(user.getUid());
-                                trip.setTripName((startAddress != null ? startAddress : "Start") + " to " + (endAddress != null ? endAddress : "End"));
-                                trip.setStartAddress(startAddress);
-                                trip.setEndAddress(endAddress);
-                                trip.setStartLat(startLatLng.latitude);
-                                trip.setStartLng(startLatLng.longitude);
-                                trip.setEndLat(endLatLng.latitude);
-                                trip.setEndLng(endLatLng.longitude);
-                                trip.setEncodedPolyline(encodedPolyline);
-                                trip.setGasStations(currentGasStations);
-                                trip.setTimestamp(System.currentTimeMillis());
-
-                                FirebaseFirestore.getInstance().collection("trips")
-                                        .add(trip)
-                                        .addOnSuccessListener(documentReference -> {
-                                            if (!isAdded() || getContext() == null) return;
-                                            trip.setId(documentReference.getId());
-                                            documentReference.update("id", documentReference.getId());
-                                            Toast.makeText(requireContext(), "Trip saved to Firebase successfully!", Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            if (!isAdded() || getContext() == null) return;
-                                            Toast.makeText(requireContext(), "Failed to save trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        });
-                            } else {
-                                Toast.makeText(requireContext(), "Trip already exists!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
+                .add(trip)
+                .addOnSuccessListener(documentReference -> {
+                    if (!isAdded() || getContext() == null) return;
+                    trip.setId(documentReference.getId());
+                    documentReference.update("id", documentReference.getId());
+                    Toast.makeText(requireContext(), "Trip saved to Firebase successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(requireContext(), "Failed to save trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-
-
     }
 
     @Override

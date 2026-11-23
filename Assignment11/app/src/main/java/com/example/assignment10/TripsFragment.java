@@ -71,6 +71,7 @@ public class TripsFragment extends Fragment {
                 .whereEqualTo("userId", user.getUid())
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!isAdded() || getContext() == null) return;
                     tripList.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Trip trip = document.toObject(Trip.class);
@@ -79,6 +80,7 @@ public class TripsFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
                     Toast.makeText(requireContext(), "Failed to load trips: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }

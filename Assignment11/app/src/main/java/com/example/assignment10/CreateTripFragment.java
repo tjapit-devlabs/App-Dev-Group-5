@@ -175,6 +175,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                             predictionDescriptions.add(p.getFullText(null).toString());
                         }
                         adapter.notifyDataSetChanged();
+                    }).addOnFailureListener(e -> {
+                        Log.e("CreateTripFragment", "Autocomplete error: " + e.getMessage(), e);
                     });
                 }
             }
@@ -208,6 +210,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                         binding.editTextEndLoc.setText(address);
                     }
                     dialog.dismiss();
+                }).addOnFailureListener(e -> {
+                    Log.e("CreateTripFragment", "Fetch place error: " + e.getMessage(), e);
                 });
             }
         });
@@ -497,11 +501,13 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
         FirebaseFirestore.getInstance().collection("trips")
                 .add(trip)
                 .addOnSuccessListener(documentReference -> {
+                    if (!isAdded() || getContext() == null) return;
                     trip.setId(documentReference.getId());
                     documentReference.update("id", documentReference.getId());
                     Toast.makeText(requireContext(), "Trip saved to Firebase successfully!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
                     Toast.makeText(requireContext(), "Failed to save trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
